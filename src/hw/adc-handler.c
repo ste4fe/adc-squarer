@@ -1,3 +1,14 @@
+/**
+ * @file adc-handler.c
+ * @author your name (you@domain.com)
+ * @brief Обработчик прерывания по АЦП
+ * @version 0.1
+ * @date 2024-09-22
+ * 
+ * @copyright Copyright (c) 2024
+ * 
+ */
+
 #include "adc-handler.h"
 
 

@@ -10,7 +10,7 @@ extern "C" {
 /**
  * @brief Low level adc handler.
  * 
- * @details Поздно вспомнил что у моего мк есть только одни ацп.
+ * @details Поздно вспомнил что у моего мк есть только один ацп.
  * 
  */
 typedef struct HW_ADC_LLHander {

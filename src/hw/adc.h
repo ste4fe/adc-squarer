@@ -7,6 +7,7 @@
 #include "adc-handler.h"
 
 namespace HW {
+
 class ADCSensor {
    public:
     void init(ADC_CHANNEL_T channel);
@@ -16,5 +17,7 @@ class ADCSensor {
     HW_ADC_LLHander LLHandlerInstance = {.conversionValue = 0};
 };
 
+/// @brief Инстанс класса АЦП
 extern ADCSensor ADCSensorInstance;
+
 }  // namespace HW

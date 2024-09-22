@@ -3,6 +3,11 @@
 
 HW::ADCSensor HW::ADCSensorInstance;
 
+/**
+ * @brief Первичная инициализация канала ацп
+ * 
+ * @param channel номер канала
+ */
 void HW::ADCSensor::init(ADC_CHANNEL_T channel) {
     ADC_Config_T adcConfig;
 
@@ -46,6 +51,11 @@ void HW::ADCSensor::init(ADC_CHANNEL_T channel) {
     HW_ADC_CurrentHandler = &this->LLHandlerInstance;
 }
 
+/**
+ * @brief Получить результат счета ацп
+ * 
+ * @return uint16_t 
+ */
 uint16_t HW::ADCSensor::getResult() {
     return this->LLHandlerInstance.conversionValue;
 }

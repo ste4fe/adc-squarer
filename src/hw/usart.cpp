@@ -5,31 +5,22 @@
 
 using namespace HW;
 
-char HW::usartBuffer[USARTbufferSize];
-USARTConsole HW::USARTConsoleInstance(
-    HW::defaultUSART,
-    HW::defaultRxDMA,
-    HW::defaultTxDMA,
-    HW::usartBuffer,
-    HW::USARTbufferSize
-);
+USARTConsole HW::USARTConsoleInstance;
 
-HW::USARTConsole::USARTConsole(
-    USART_T *dUSART,
-    DMA_Channel_T *rxDMA,
-    DMA_Channel_T *txDMA,
-    char *pBuffer,
-    size_t sBuffer
-)
-    : DesktopConsole(pBuffer, sBuffer) {
-    this->_USART = dUSART;
-    this->_rxDMA = rxDMA;
-    this->_txDMA = txDMA;
-}
-
-void HW::USARTConsole::init() {
+/**
+ * @brief Первичная инициализация консоли
+ * 
+ * @param USART Указатель на USART
+ * @param rxDMA DMA приемника
+ * @param txDMA DMA передатчика
+ */
+void HW::USARTConsole::init(USART_T *USART, DMA_Channel_T *rxDMA, DMA_Channel_T *txDMA) {
     DMA_Config_T DMAConfig;
     USART_Config_T USARTConfig;
+
+    this->_USART = USART;
+    this->_rxDMA = rxDMA;
+    this->_txDMA = txDMA;
 
     USARTConfig.baudRate = baudRate;
     USARTConfig.hardwareFlow = USART_HARDWARE_FLOW_NONE;
@@ -72,9 +63,14 @@ void HW::USARTConsole::init() {
     USART_EnableDMA(this->_USART, USART_DMA_TX_RX);
     USART_Enable(this->_USART);
 
-    memset(this->_pDMABuffer, 0, this->_sDMABuffer);
+    memset(this->_pDMABuffer, 0, USARTbufferSize);
 }
 
+/**
+ * @brief Отправить ответ
+ * 
+ * @param answer Строка ответа
+ */
 void HW::USARTConsole::loadAnswer(const char *answer) {
     this->_txDMA->CHCFG_B.CHEN = DISABLE;
     this->_txDMA->CHMADDR = (uint32_t)answer;
@@ -87,14 +83,59 @@ void HW::USARTConsole::loadAnswer(const char *answer) {
     // }
 
     this->_rxDMA->CHCFG_B.CHEN = DISABLE;
-    this->_rxDMA->CHNDATA = sizeof(usartBuffer);
+    this->_rxDMA->CHNDATA = USARTbufferSize;
     this->_rxDMA->CHCFG_B.CHEN = ENABLE;
 }
 
+/**
+ * @brief Занята ли консоль приемом/передачей
+ * 
+ * @return true 
+ * @return false 
+ */
 bool HW::USARTConsole::busy() {
     if (USART_ReadStatusFlag(this->_USART, USART_FLAG_TXBE)) {
         return false;
     } else {
         return true;
     }
+}
+
+/**
+ * @brief Получить длинну принятого сообщения
+ * 
+ * @return size_t 
+ */
+size_t HW::USARTConsole::getLineSize() const {
+    const char *pLineEnd =
+        (const char *)memchr(this->_pDMABuffer, '\n', USARTbufferSize);
+
+    if (pLineEnd == nullptr) {
+        return 0;
+    }
+
+    return pLineEnd - this->_pDMABuffer;
+}
+
+
+/**
+ * @brief
+ *
+ * @param[out] pDst Куда записывать получившееся сообщение. Размер буффера
+ * должен быть не меньше `sDMABuffer`. Последний байт окончания линии будет
+ * удален.
+ * @return size_t Размер строки
+ */
+size_t HW::USARTConsole::getLine(char *pDst) {
+    size_t takedStringSize = this->getLineSize();
+
+    if (takedStringSize == 0) {
+        return 0;
+    }
+
+    memcpy(pDst, this->_pDMABuffer, takedStringSize);
+
+    memset(this->_pDMABuffer, 0, takedStringSize + 1);
+
+    return takedStringSize;
 }

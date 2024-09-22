@@ -1,4 +1,3 @@
-
 #include <string.h>
 
 #include "hw/adc.h"
@@ -94,8 +93,7 @@ int main() {
     HW::Pins::USARTPinRX.config(GPIO_SPEED_50MHz, GPIO_MODE_IN_FLOATING);
     HW::Pins::ADCPin.config(GPIO_SPEED_50MHz, GPIO_MODE_ANALOG);
 
-    HW::USARTConsoleInstance = HW::USARTConsole(HW::defaultUSART, HW::defaultRxDMA, HW::defaultTxDMA, HW::usartBuffer, HW::USARTbufferSize);
-    HW::USARTConsoleInstance.init();
+    HW::USARTConsoleInstance.init(HW::defaultUSART, HW::defaultRxDMA, HW::defaultTxDMA);
     adc.init(ADC_CHANNEL_0);
 
     PT_INIT(&threadDispatcher);

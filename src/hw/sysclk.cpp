@@ -3,6 +3,10 @@
 #include <apm32f10x_rcm.h>
 #include "systick.h"
 
+/**
+ * @brief Настройка тактирования
+ * 
+ */
 void HW::SysCLK::init() {
     SystemInit();
     SystemCoreClockUpdate();
