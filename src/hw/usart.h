@@ -9,8 +9,9 @@ namespace HW {
 static auto *const defaultUSART = USART1;
 static auto *const defaultTxDMA = DMA1_Channel4;
 static auto *const defaultRxDMA = DMA1_Channel5;
-static const size_t bufferSize = 64;
-static const uint32_t baudRate = 115200;
+static const size_t USARTbufferSize = 64;
+static const uint32_t baudRate = 38400;
+extern char usartBuffer[USARTbufferSize];
 
 class USARTConsole : public device::DesktopConsole {
    public:
@@ -23,7 +24,9 @@ class USARTConsole : public device::DesktopConsole {
     );
     // USARTConsole() = default;
     void init();
-    void loadAnswer(const char *answer) override;
+    void loadAnswer(const char *answer);
+
+    bool busy();
 
    private:
     USART_T *_USART;
@@ -31,6 +34,6 @@ class USARTConsole : public device::DesktopConsole {
     DMA_Channel_T *_txDMA;
 };
 
-extern USARTConsole Console;
+extern USARTConsole USARTConsoleInstance;
 
 }  // namespace HW

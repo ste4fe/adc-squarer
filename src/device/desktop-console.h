@@ -20,7 +20,7 @@ class DesktopConsole {
 
     size_t getLineSize() const;
     size_t getLine(char *pDst);
-    virtual void loadAnswer(const char *answer);
+    // virtual void loadAnswer(const char *answer);
 
    protected:
     char *_pDMABuffer;

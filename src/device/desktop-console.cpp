@@ -28,14 +28,14 @@ size_t device::DesktopConsole::getLine(char *pDst) {
         return 0;
     }
 
-    memcpy(pDst, this->_pDMABuffer, takedStringSize - 1);
+    memcpy(pDst, this->_pDMABuffer, takedStringSize);
 
-    memset(pDst, 0, takedStringSize);
+    memset(this->_pDMABuffer, 0, takedStringSize + 1);
 
     return takedStringSize;
 }
 
-void device::DesktopConsole::loadAnswer(const char *answer) {}
+// void device::DesktopConsole::loadAnswer(const char *answer) {}
 
 device::DesktopConsole::DesktopConsole(char *pDMABuffer, size_t sDMABuffer) {
     memset(pDMABuffer, 0, sDMABuffer);

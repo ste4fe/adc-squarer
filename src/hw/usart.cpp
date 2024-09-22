@@ -5,13 +5,13 @@
 
 using namespace HW;
 
-char usartBuffer[bufferSize];
-USARTConsole HW::Console(
-    defaultUSART,
-    defaultRxDMA,
-    defaultTxDMA,
-    usartBuffer,
-    sizeof(usartBuffer)
+char HW::usartBuffer[USARTbufferSize];
+USARTConsole HW::USARTConsoleInstance(
+    HW::defaultUSART,
+    HW::defaultRxDMA,
+    HW::defaultTxDMA,
+    HW::usartBuffer,
+    HW::USARTbufferSize
 );
 
 HW::USARTConsole::USARTConsole(
@@ -22,7 +22,7 @@ HW::USARTConsole::USARTConsole(
     size_t sBuffer
 )
     : DesktopConsole(pBuffer, sBuffer) {
-    this->_USART = USART1;
+    this->_USART = dUSART;
     this->_rxDMA = rxDMA;
     this->_txDMA = txDMA;
 }
@@ -56,14 +56,14 @@ void HW::USARTConsole::init() {
     DMA_Config(this->_txDMA, &DMAConfig);
 
     // RX DMA channel config
-    DMAConfig.bufferSize = bufferSize;
+    DMAConfig.bufferSize = USARTbufferSize;
     DMAConfig.memoryBaseAddr = (uint32_t)this->_pDMABuffer;
     DMAConfig.loopMode = DMA_MODE_CIRCULAR;
     DMAConfig.dir = DMA_DIR_PERIPHERAL_SRC;
 
     DMA_Disable(this->_rxDMA);
     DMA_Config(this->_rxDMA, &DMAConfig);
-    DMA_Enable(this->_rxDMA);
+    this->_rxDMA->CHCFG_B.CHEN = true;
 
     USART_Disable(this->_USART);
     USART_Reset(this->_USART);
@@ -80,4 +80,21 @@ void HW::USARTConsole::loadAnswer(const char *answer) {
     this->_txDMA->CHMADDR = (uint32_t)answer;
     this->_txDMA->CHNDATA = strlen(answer);
     this->_txDMA->CHCFG_B.CHEN = ENABLE;
+
+    // while(*answer != 0) {
+    //     while (USART_ReadStatusFlag(this->_USART, USART_FLAG_TXBE) == RESET)
+    //     {} USART_TxData(this->_USART, *answer); answer++;
+    // }
+
+    this->_rxDMA->CHCFG_B.CHEN = DISABLE;
+    this->_rxDMA->CHNDATA = sizeof(usartBuffer);
+    this->_rxDMA->CHCFG_B.CHEN = ENABLE;
+}
+
+bool HW::USARTConsole::busy() {
+    if (USART_ReadStatusFlag(this->_USART, USART_FLAG_TXBE)) {
+        return false;
+    } else {
+        return true;
+    }
 }
