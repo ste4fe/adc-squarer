@@ -1,0 +1,19 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "cortex-debug",
+            "executable": "./build/${workspaceFolderBasename}.elf",
+            "name": "Debug MCU",
+            "request": "launch",
+            "servertype": "openocd",
+            "runToEntryPoint": "main",
+            "configFiles": [
+                "./apm32f1x.cfg"
+            ],
+            "svdFile": "./APM32F103xx.svd",
+            "preLaunchTask": "cmake: build debug",
+            
+        },
+    ]
+}

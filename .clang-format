@@ -1,0 +1,9 @@
+---
+BasedOnStyle: Chromium 
+AllowShortBlocksOnASingleLine: Empty
+PointerAlignment: Right
+IndentWidth: 4
+UseTab: Never
+AlignAfterOpenBracket: BlockIndent
+# IndentPPDirectives: None
+...
